@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Created by shanlin on 2017/8/31.
  */
-public class Param {
+public class Param extends BaseBean{
     private Map<String, Object> map;
 
 

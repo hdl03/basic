@@ -24,7 +24,6 @@ public class CustomerController {
     public View getCustomers() {
         LOGGER.info("初始化界面");
         List<Customer> customers = customerService.getCustomers();
-
         return new View("customers.jsp").addModel("customers",customers);
 
     }

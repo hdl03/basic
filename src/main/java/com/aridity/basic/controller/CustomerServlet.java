@@ -17,7 +17,7 @@ import java.util.List;
  * 创建客户
  * Created by shanlin on 2017/8/29.
  */
-@WebServlet("/customers")
+//@WebServlet("/customers")
 public class CustomerServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomerServlet.class);
     private CustomerService customerService;

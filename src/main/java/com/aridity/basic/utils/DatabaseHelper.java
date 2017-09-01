@@ -64,7 +64,7 @@ public class DatabaseHelper {
         Connection connection = CONNECTION_THREAD_LOCAL.get();
         try {
             if (null == connection || !connection.isClosed()) {
-                connection.close();
+                //connection.close();
             }
         } catch (SQLException sql) {
             LOGGER.error("关闭数据库连接失败", sql);

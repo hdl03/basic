@@ -27,6 +27,8 @@ public final class ClassUtils {
         return Thread.currentThread().getContextClassLoader();
     }
 
+    private static Set<Class<?>> sets = new HashSet<>();
+
     /**
      * 加载类
      *
@@ -40,6 +42,7 @@ public final class ClassUtils {
             cls = Class.forName(className, isInit, getClassLoad());
         } catch (ClassNotFoundException classNotFound) {
             LOGGER.error("类查找不到", classNotFound);
+            throw new RuntimeException("类查找不到", classNotFound);
         }
         return cls;
     }
@@ -53,9 +56,10 @@ public final class ClassUtils {
      */
     public static void loadClass(Class<?> className) {
         try {
-            getClassLoad().loadClass(className.getName());
+            Class.forName(className.getName(), true, getClassLoad());
         } catch (ClassNotFoundException classNotFound) {
             LOGGER.error("类查找不到", classNotFound);
+            throw new RuntimeException("类查找不到", classNotFound);
         }
     }
 
@@ -67,16 +71,20 @@ public final class ClassUtils {
     public static Set<Class<?>> getClassSet(String basePackage) {
         Set<Class<?>> sets = new HashSet<>();
         try {
-            //
+            //获取指定包下的路径
             Enumeration<URL> enumeration = getClassLoad().getResources(basePackage.replace(".", "/"));
-
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 String protocol = url.getProtocol();
+                LOGGER.debug("获取到的路径 ： {}", url);
+                // 文件处理
                 if ("file".equals(protocol)) {
+                    // 处理空格
                     String basePackagePath = url.getPath().replaceAll("%20", " ");
-                    addClass(basePackagePath, basePackage);
+                    LOGGER.debug("基础路径 {}", basePackagePath);
+                    sets.addAll(addClass(basePackagePath, basePackage));
                 } else if ("jar".equals(url.getProtocol())) {
+                    // jar 包处理
                     JarURLConnection jarURLConnection = (JarURLConnection) url.openConnection();
                     if (null != jarURLConnection) {
                         JarFile jarFile = jarURLConnection.getJarFile();
@@ -95,32 +103,42 @@ public final class ClassUtils {
 
         } catch (IOException ioException) {
             LOGGER.error("IO 异常", ioException);
+            throw new RuntimeException("IO 异常", ioException);
         }
+        LOGGER.debug("收集到的类大小{}", sets.size());
         return sets;
 
     }
 
 
-    public static Set<Class<?>> addClass(String basePackagePath, String basePackage) {
-        Set<Class<?>> sets = new HashSet<>();
+    //加载指定路径下，所有的类
+    public static Set<Class<?>> addClass(final String basePackagePath, final String basePackage) {
+        LOGGER.debug("路径 ：{} ， 包名 {} 。", basePackagePath, basePackage);
         File[] files = new File(basePackagePath).listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return file.isFile() && file.getName().endsWith(".class") || file.isDirectory();
             }
         });
-
-        for (File file : files) {
-
-            if (file.isFile()) {
-                String className = file.getName().substring(0, file.getName().lastIndexOf("."));
-                className = basePackage + className;
-                sets.add(loadClass(className, false));
-            } else {
-                String subPackagePath = file.getName();
-                basePackagePath = subPackagePath + "/" + subPackagePath;
-                basePackage = basePackage + "." + subPackagePath;
-                addClass(basePackagePath, basePackage);
+        // 指定包下的路径不为空，加载class 类
+        if (null != files && files.length > 0) {
+            LOGGER.debug("指定路径下的的类数量 {}", files.length);
+            for (File file : files) {
+                if (file.isFile()) {
+                    // 文件，加载类
+                    LOGGER.debug("加载类{}", file.getName());
+                    String className = file.getName().substring(0, file.getName().lastIndexOf("."));
+                    className = basePackage + "." + className;
+                    LOGGER.debug("加载类{},类的完整路径 {}", file.getName(), className);
+                    sets.add(loadClass(className, false));
+                } else {
+                    // 是路径，递归调用
+                    LOGGER.debug("是路径，不是文件");
+                    String subPackagePath = file.getName();
+                    String packagePath = basePackagePath + "/" + subPackagePath;
+                    String packageName = basePackage + "." + subPackagePath;
+                    addClass(packagePath, packageName);
+                }
             }
         }
         return sets;

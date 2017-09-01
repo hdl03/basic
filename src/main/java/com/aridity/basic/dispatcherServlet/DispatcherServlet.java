@@ -30,6 +30,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void init(ServletConfig config) throws ServletException {
+        LOG.debug("初始化信息");
         // 初始化helper
         HelperLoad.initLoad();
         // 获取 servletContext
@@ -46,13 +47,13 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOG.info("根据路径和方法进行分发");
+        LOG.debug("根据路径和方法进行分发");
         String requestMethod = req.getMethod().toLowerCase();
         String requestPath = req.getPathInfo();
-
         Handler handler = ControllerHelper.getHandler(requestMethod, requestPath);
         Map<String, Object> params = new HashMap<>();
         if (null != handler) {
+            Param param = null;
             Enumeration<String> parameterNames = req.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String name = parameterNames.nextElement();
@@ -60,9 +61,7 @@ public class DispatcherServlet extends HttpServlet {
                 params.put(name, value);
             }
             String body = CodeUtils.decodeURL(StreamUtils.getString(req.getInputStream()));
-
             if (StringUtils.isNoneBlank(body)) {
-
                 String[] arrays = body.split("&");
                 if (null != arrays) {
                     for (String array : arrays) {
@@ -72,44 +71,44 @@ public class DispatcherServlet extends HttpServlet {
                         }
                     }
                 }
-
             }
-
-        }
-
-        Param param = new Param(params);
-
-        Method method = handler.getMethod();
-
-        Class<?> cls = handler.getController();
-        Object obj = BeanUtils.getBean(cls);
-        Object result = ReflectUtils.invokeMethod(obj, method, param);
-
-        if (result instanceof View) {
-            View view = (View) result;
-            String path = view.getPath();
-            if (StringUtils.isNoneBlank(path)) {
-
-                if (path.startsWith("/")) {
-                    resp.sendRedirect(req.getContextPath() + path);
-                } else {
-                    Map<String, Object> model = view.getModel();
-                    for (Map.Entry<String, Object> objectEntry : model.entrySet()) {
-                        req.setAttribute(objectEntry.getKey(), objectEntry.getValue());
+            Method method = handler.getMethod();
+            Class<?> cls = handler.getController();
+            Object obj = BeanUtils.getBean(cls);
+            Object result = null;
+            if (!params.isEmpty()) {
+                LOG.debug("参数 {}", param);
+                param = new Param(params);
+                result = ReflectUtils.invokeMethod(obj, method, param.getMap().values());
+            } else {
+                result = ReflectUtils.invokeMethod(obj, method);
+            }
+            if (result instanceof View) {
+                View view = (View) result;
+                String path = view.getPath();
+                if (StringUtils.isNoneBlank(path)) {
+                    if (path.startsWith("/")) {
+                        resp.sendRedirect(req.getContextPath() + path);
+                    } else {
+                        Map<String, Object> model = view.getModel();
+                        for (Map.Entry<String, Object> objectEntry : model.entrySet()) {
+                            req.setAttribute(objectEntry.getKey(), objectEntry.getValue());
+                        }
+                        req.getRequestDispatcher(ConfigHelper.getJspPath() + path).forward(req, resp);
                     }
-                    req.getRequestDispatcher(ConfigHelper.getJspPath() + path).forward(req, resp);
-                }
 
+                }
+            } else if (result instanceof Data) {
+                Data data = (Data) result;
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                PrintWriter printWriter = resp.getWriter();
+                String json = JsonUtils.toJson(data);
+                printWriter.write(json);
+                printWriter.flush();
+                printWriter.close();
             }
-        } else if (result instanceof Data) {
-            Data data = (Data) result;
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-            PrintWriter printWriter = resp.getWriter();
-            String json = JsonUtils.toJson(data);
-            printWriter.write(json);
-            printWriter.flush();
-            printWriter.close();
+
         }
 
 

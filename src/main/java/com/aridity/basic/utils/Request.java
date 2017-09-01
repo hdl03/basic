@@ -3,7 +3,7 @@ package com.aridity.basic.utils;
 /**
  * Created by shanlin on 2017/8/31.
  */
-public class Request {
+public class Request extends BaseBean {
     private String requestMethod;
     private String requestPath;
 

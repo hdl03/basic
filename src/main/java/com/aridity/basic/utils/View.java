@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by shanlin on 2017/8/31.
  */
-public class View {
+public class View extends BaseBean{
     private String path;
     private Map<String, Object> model;
 

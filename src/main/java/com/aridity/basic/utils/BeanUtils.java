@@ -6,6 +6,8 @@ import java.util.Set;
 
 /**
  * Created by shanlin on 2017/8/31.
+ *
+ * 获取所有的Controller 和 Service
  */
 public final class BeanUtils {
 

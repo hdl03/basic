@@ -5,6 +5,7 @@ import java.util.Set;
 
 /**
  * Created by shanlin on 2017/8/31.
+ * 加载所有的类
  */
 public final class ClassHelper {
     private static final Set<Class<?>> SETS;

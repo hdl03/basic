@@ -3,7 +3,7 @@ package com.aridity.basic.utils;
 /**
  * Created by shanlin on 2017/8/31.
  */
-public class Data {
+public class Data extends BaseBean{
     private Object value;
 
     public Object getValue() {

@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 /**
  * Created by shanlin on 2017/8/31.
  */
-public class Handler {
+public class Handler extends BaseBean{
     private Class<?> controller;
     private Method method;
 
