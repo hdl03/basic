@@ -17,14 +17,14 @@ public final class IocUtils {
 
     static {
         Map<Class<?>, Object> classObjectMap = BeanUtils.getBeanMap();
-        LOG.info("IOC 获取初始Bean {}", classObjectMap);
+        LOG.debug("IOC 获取初始Bean {}", classObjectMap);
         for (Map.Entry<Class<?>, Object> cls : classObjectMap.entrySet()) {
             Class<?> key = cls.getKey();
             Object obj = cls.getValue();
-            LOG.info("IOC 记载类 {} ，{}", key, obj);
+            LOG.debug("IOC 记载类 {} ，{}", key, obj);
             Field[] fields = key.getDeclaredFields();
             if (null != fields && fields.length > 0) {
-                LOG.info("IOC 类属性数量 {} ", fields.length);
+                LOG.debug("IOC 类属性数量 {} ", fields.length);
                 for (Field field : fields) {
                     if (field.isAnnotationPresent(Autowired.class)) {
                         Class<?> beanFieldClass = field.getType();

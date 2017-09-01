@@ -2,14 +2,12 @@ package com.aridity.basic.controller;
 
 import com.aridity.basic.model.Customer;
 import com.aridity.basic.service.CustomerService;
-import com.aridity.basic.utils.Autowired;
-import com.aridity.basic.utils.Controller;
-import com.aridity.basic.utils.RequestMapping;
-import com.aridity.basic.utils.View;
+import com.aridity.basic.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by shanlin on 2017/8/31.
@@ -24,8 +22,36 @@ public class CustomerController {
     public View getCustomers() {
         LOGGER.info("初始化界面");
         List<Customer> customers = customerService.getCustomers();
-        return new View("customers.jsp").addModel("customers",customers);
-
+        return new View("customers.jsp").addModel("customers", customers);
     }
+
+    @RequestMapping(name = "get:/customer")
+    public View getCustomer(Long id) {
+        LOGGER.info("查询详情");
+        Customer customer = customerService.getCustomer(id);
+        return new View("customers.jsp").addModel("customer", customer);
+    }
+
+    @RequestMapping(name = "put:/customer")
+    public void editCustomer(Long id, Map<String, Object> map) {
+        LOGGER.info("修改客户信息");
+        boolean flag = customerService.updateCustomer(id, map);
+        //return new Data("");
+    }
+
+    @RequestMapping(name = "post:/customer")
+    public void getCustomers(Map<String, Object> map) {
+        LOGGER.info("创建客户信息");
+        boolean flag = customerService.createCustomer(map);
+        // return new View("customers.jsp").addModel("customers", customers);
+    }
+
+    @RequestMapping(name = "delete:/customer")
+    public void getCustomers(Long id) {
+        LOGGER.info("删除客户信息");
+        boolean flags = customerService.deleteCustomer(id);
+        //return new View("customers.jsp").addModel("customers", customers);
+    }
+
 
 }
