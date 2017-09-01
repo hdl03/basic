@@ -26,10 +26,10 @@ public class CustomerController {
     }
 
     @RequestMapping(name = "get:/customer")
-    public View getCustomer(Long id) {
+    public View getCustomer(Param param) {
         LOGGER.info("查询详情");
-        Customer customer = customerService.getCustomer(id);
-        return new View("customers.jsp").addModel("customer", customer);
+        Customer customer = customerService.getCustomer((Long)param.getMap().get("id"));
+        return new View("show_customer.jsp").addModel("customer", customer);
     }
 
     @RequestMapping(name = "put:/customer")
@@ -40,7 +40,7 @@ public class CustomerController {
     }
 
     @RequestMapping(name = "post:/customer")
-    public void getCustomers(Map<String, Object> map) {
+    public void createCustomers(Map<String, Object> map) {
         LOGGER.info("创建客户信息");
         boolean flag = customerService.createCustomer(map);
         // return new View("customers.jsp").addModel("customers", customers);
