@@ -77,9 +77,9 @@ public class DispatcherServlet extends HttpServlet {
             Object obj = BeanUtils.getBean(cls);
             Object result = null;
             if (!params.isEmpty()) {
-                LOG.debug("参数 {}", param);
+                LOG.debug("参数 {}", params);
                 param = new Param(params);
-                result = ReflectUtils.invokeMethod(obj, method, param.getMap().values());
+                result = ReflectUtils.invokeMethod(obj, method, param);
             } else {
                 result = ReflectUtils.invokeMethod(obj, method);
             }

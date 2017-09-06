@@ -28,29 +28,45 @@ public class CustomerController {
     @RequestMapping(name = "get:/customer")
     public View getCustomer(Param param) {
         LOGGER.info("查询详情");
-        Customer customer = customerService.getCustomer((Long)param.getMap().get("id"));
+        Customer customer = customerService.getCustomer((Long) param.getMap().get("id"));
         return new View("show_customer.jsp").addModel("customer", customer);
     }
 
-    @RequestMapping(name = "put:/customer")
-    public void editCustomer(Long id, Map<String, Object> map) {
+    @RequestMapping(name = "get:/create_customer")
+    public View createCustomer() {
         LOGGER.info("修改客户信息");
-        boolean flag = customerService.updateCustomer(id, map);
-        //return new Data("");
+        return new View("create_customer.jsp");
     }
 
     @RequestMapping(name = "post:/customer")
-    public void createCustomers(Map<String, Object> map) {
+    public Data createCustomers(Map<String, Object> map) {
         LOGGER.info("创建客户信息");
-        boolean flag = customerService.createCustomer(map);
-        // return new View("customers.jsp").addModel("customers", customers);
+        Boolean flag = customerService.createCustomer(map);
+        return new Data(flag);
     }
 
+    @RequestMapping(name = "get:/edit_customer")
+    public View editCustomer(Param param) {
+        LOGGER.info("修改客户信息 {}", param.getMap());
+        Object id =  param.getMap().get("id");
+        LOGGER.info("修改客户信息 id is  {}", id);
+        Customer customer = customerService.getCustomer(id);
+        return new View("edit_customer.jsp").addModel("customer", customer);
+    }
+
+    @RequestMapping(name = "put:/customer")
+    public Data editCustomer(Long id, Map<String, Object> map) {
+        LOGGER.info("修改客户信息");
+        boolean flag = customerService.updateCustomer(id, map);
+        return new Data(flag);
+    }
+
+
     @RequestMapping(name = "delete:/customer")
-    public void getCustomers(Long id) {
+    public Data deleteCustomers(Long id) {
         LOGGER.info("删除客户信息");
         boolean flags = customerService.deleteCustomer(id);
-        //return new View("customers.jsp").addModel("customers", customers);
+        return new Data(flags);
     }
 
 

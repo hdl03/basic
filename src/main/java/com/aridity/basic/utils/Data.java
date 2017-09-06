@@ -6,6 +6,10 @@ package com.aridity.basic.utils;
 public class Data extends BaseBean{
     private Object value;
 
+    public Data(Object value) {
+        this.value = value;
+    }
+
     public Object getValue() {
         return value;
     }

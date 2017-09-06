@@ -28,8 +28,8 @@
             <td>${customer.telephone}</td>
             <td>${customer.remark}</td>
             <td>
-                <a href="${BASE}/edit_customer?id = ${customer.id}">编辑</a>
-                <a href="${BASE}/delete_customer?id = ${customer.id}">删除</a>
+                <a href="${BASE}/edit_customer?id=${customer.id}">编辑</a>
+                <a href="${BASE}/delete_customer?id=${customer.id}">删除</a>
             </td>
         </tr>
     </c:forEach>
