@@ -1,5 +1,6 @@
 package com.aridity.basic.utils;
 
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanHandler;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,7 +120,7 @@ public class DatabaseHelper {
     }
 
 
-    public static <T> Boolean updateEntity(Class<T> entityClass, Long id, Map<String, Object> fieldMap) {
+    public static <T> Boolean updateEntity(Class<T> entityClass, Object id, Map<String, Object> fieldMap) {
 
         if (null == fieldMap || fieldMap.isEmpty()) {
             LOGGER.info("修改数据库属性为空");
@@ -132,9 +134,11 @@ public class DatabaseHelper {
         }
         sql.deleteCharAt(sql.length() - 1);
         sql.append(" where id = ?");
-        fieldMap.put("id", id);
-        LOGGER.info("打印sql 语句 {}", sql.toString());
-        return 1 == executeUpdate(sql.toString(), fieldMap.values().toArray());
+        Map<String,Object> map = new LinkedHashMap<>();
+        map.putAll(fieldMap);
+        map.put("id", id);
+        LOGGER.info("打印sql 语句 {} 和 值 {}", sql.toString(),map.values().toArray());
+        return 1 == executeUpdate(sql.toString(), map.values().toArray());
     }
 
 

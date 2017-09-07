@@ -28,7 +28,7 @@ public class CustomerController {
     @RequestMapping(name = "get:/customer")
     public View getCustomer(Param param) {
         LOGGER.info("查询详情");
-        Customer customer = customerService.getCustomer((Long) param.getMap().get("id"));
+        Customer customer = customerService.getCustomer(param.getMap().get("id"));
         return new View("show_customer.jsp").addModel("customer", customer);
     }
 
@@ -39,25 +39,27 @@ public class CustomerController {
     }
 
     @RequestMapping(name = "post:/customer")
-    public Data createCustomers(Map<String, Object> map) {
+    public Data createCustomers(Param param) {
         LOGGER.info("创建客户信息");
-        Boolean flag = customerService.createCustomer(map);
+        Boolean flag = customerService.createCustomer(param.getMap());
         return new Data(flag);
     }
 
     @RequestMapping(name = "get:/edit_customer")
     public View editCustomer(Param param) {
-        LOGGER.info("修改客户信息 {}", param.getMap());
-        Object id =  param.getMap().get("id");
-        LOGGER.info("修改客户信息 id is  {}", id);
+        LOGGER.info("页面跳转");
+        Object id = param.getMap().get("id");
         Customer customer = customerService.getCustomer(id);
         return new View("edit_customer.jsp").addModel("customer", customer);
     }
 
-    @RequestMapping(name = "put:/customer")
-    public Data editCustomer(Long id, Map<String, Object> map) {
+    @RequestMapping(name = "post:/editCustomer")
+    public Data editCustomerData(Param param) {
         LOGGER.info("修改客户信息");
-        boolean flag = customerService.updateCustomer(id, map);
+        Object id = param.getMap().get("id");
+        LOGGER.info("打印id ：{} 和 map 信息{}", id, param.getMap());
+        param.getMap().remove("id");
+        boolean flag = customerService.updateCustomer(id, param.getMap());
         return new Data(flag);
     }
 

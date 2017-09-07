@@ -47,9 +47,10 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOG.debug("根据路径和方法进行分发");
         String requestMethod = req.getMethod().toLowerCase();
         String requestPath = req.getPathInfo();
+        LOG.debug("根据路径和方法进行分发 路径 和 方法 {}，{}", requestPath, requestMethod);
+        req.setCharacterEncoding("utf-8");
         Handler handler = ControllerHelper.getHandler(requestMethod, requestPath);
         Map<String, Object> params = new HashMap<>();
         if (null != handler) {

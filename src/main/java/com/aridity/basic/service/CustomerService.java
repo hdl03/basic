@@ -46,7 +46,7 @@ public class CustomerService {
         return DatabaseHelper.insertEntity(Customer.class, map);
     }
 
-    public boolean updateCustomer(Long id, Map<String, Object> map) {
+    public boolean updateCustomer(Object id, Map<String, Object> map) {
         return DatabaseHelper.updateEntity(Customer.class, id, map);
     }
 
