@@ -17,7 +17,7 @@ public final class IocUtils {
 
     static {
         Map<Class<?>, Object> classObjectMap = BeanUtils.getBeanMap();
-        LOG.debug("IOC 获取初始Bean {}", classObjectMap);
+        LOG.debug("IOC 获取初始Bean {}");
         for (Map.Entry<Class<?>, Object> cls : classObjectMap.entrySet()) {
             Class<?> key = cls.getKey();
             Object obj = cls.getValue();

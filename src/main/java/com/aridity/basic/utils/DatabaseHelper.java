@@ -65,11 +65,13 @@ public class DatabaseHelper {
     public static void closeConnection() {
         Connection connection = CONNECTION_THREAD_LOCAL.get();
         try {
-            if (null == connection || !connection.isClosed()) {
-                //connection.close();
+            if (null != connection && !connection.isClosed()) {
+                connection.close();
             }
         } catch (SQLException sql) {
             LOGGER.error("关闭数据库连接失败", sql);
+        } finally {
+            CONNECTION_THREAD_LOCAL.remove();
         }
     }
 
@@ -134,10 +136,10 @@ public class DatabaseHelper {
         }
         sql.deleteCharAt(sql.length() - 1);
         sql.append(" where id = ?");
-        Map<String,Object> map = new LinkedHashMap<>();
+        Map<String, Object> map = new LinkedHashMap<>();
         map.putAll(fieldMap);
         map.put("id", id);
-        LOGGER.info("打印sql 语句 {} 和 值 {}", sql.toString(),map.values().toArray());
+        LOGGER.info("打印sql 语句 {} 和 值 {}", sql.toString(), map.values().toArray());
         return 1 == executeUpdate(sql.toString(), map.values().toArray());
     }
 
@@ -176,4 +178,49 @@ public class DatabaseHelper {
         return 0;
 
     }
+
+    public static void beginTarnsaction() {
+        Connection conn = CONNECTION_THREAD_LOCAL.get();
+        try {
+            if (null != conn) {
+                conn.setAutoCommit(false);
+            }
+        } catch (SQLException sql) {
+            LOGGER.error("数据库异常", sql);
+            throw new RuntimeException(sql);
+        } finally {
+            CONNECTION_THREAD_LOCAL.set(conn);
+        }
+    }
+
+    public static void commitTransaction() {
+        Connection conn = CONNECTION_THREAD_LOCAL.get();
+        try {
+            if (null != conn) {
+                conn.commit();
+                conn.close();
+            }
+        } catch (SQLException sql) {
+            LOGGER.error("数据库异常", sql);
+            throw new RuntimeException(sql);
+        } finally {
+            CONNECTION_THREAD_LOCAL.remove();
+        }
+    }
+
+    public static void rollback() {
+        Connection conn = CONNECTION_THREAD_LOCAL.get();
+        try {
+            if (null != conn) {
+                conn.rollback();
+            }
+        } catch (SQLException sql) {
+            LOGGER.error("数据库异常", sql);
+            throw new RuntimeException(sql);
+        } finally {
+            closeConnection();
+        }
+    }
+
+
 }
